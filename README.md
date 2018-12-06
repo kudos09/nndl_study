@@ -1,2 +1,2 @@
-# nndl_stydy
+# nndl_study
 nndl-ebook study
