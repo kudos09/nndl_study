@@ -1,0 +1,77 @@
+import mnist_loader
+training_data, validation_data, test_data=mnist_loader.load_data_wrapper()
+import network
+net = network.Network([784, 30, 10])
+net.SGD(training_data, 30, 10, 3.0, test_data=test_data)
+net = network.Network([784, 30, 10])
+net.SGD(training_data, 30, 10, 3.0, test_data=test_data)
+
+
+30 次迭代期
+小批量数据大小为10
+3.0  的学习速率
+
+原来的代码是在Python2上实现的，我在用Python3实现时遇到了不少问题。
+
+mnist_loader中：
+
+（1）ModuleNotFoundError: No module named 'cPickle'
+
+python3里不再有cPickle模块，所以只能用pickle。
+
+import pickle
+
+training_data, validation_data, test_data = pickle.load(f,encoding="bytes")
+
+（2）UnicodeDecodeError: 'ascii' codec can't decode byte 0x90 in position 614: ordinal not in range(128)
+
+这是因为python3里的pickle的load的参数中默认encoding是ASCII，所以解决这个问题需要将上述语句改为：
+
+
+training_data, validation_data, test_data = pickle.load(f,encoding="bytes")
+
+（3）TypeError: object of type 'zip' has no len()
+
+在python3中，zip生成的是一个迭代器，所以不能直接用len来得到其长度。
+
+将load_data_wrapper()里的有用到zip语句，都将zip(...)改为list(zip(...))
+2.network.py中
+
+（4） print "Epoch {0}: {1} / {2}".format(
+                               ^
+SyntaxError: invalid syntax
+
+Python3中print函数需要加括号。
+
+ print ("Epoch {0}: {1} / {2}".format(
+                    j, self.evaluate(test_data), n_test))
+            else:
+                print ("Epoch {0} complete".format(j))
+
+（5）NameError: name 'xrange' is not defined
+
+在python2里，range直接生成list，而xrange生成的是生成器。而在python3里，两者合并成range，生成一个生成器。
+
+将network.py里有用到xrange的地方改为range
+
+调试完成后可按以下步骤操作：
+
+import mnist_loader
+
+training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
+
+import network
+
+net = network.Network([784, 30, 10])
+
+net.SGD(training_data, 30, 10, 3.0, test_data=test_data)
+
+3.mnist_average_darkness
+
+这里也需要先修改print函数
+
+（6）AttributeError: 'collections.defaultdict' object has no attribute 'iteritems'
+
+将两处iteritems()改为items()
+
+4.mnist_svm
