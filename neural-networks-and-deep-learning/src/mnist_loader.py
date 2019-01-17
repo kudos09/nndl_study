@@ -66,6 +66,7 @@ def load_data_wrapper():
     turn out to be the most convenient for use in our neural network
     code."""
     tr_d, va_d, te_d = load_data()
+    print("1tr_d:\n", tr_d, len(tr_d), "\n2va_d:\n", va_d, len(va_d), "\n3te_d:\n", te_d, len(te_d))
     training_inputs = [np.reshape(x, (784, 1)) for x in tr_d[0]]
     training_results = [vectorized_result(y) for y in tr_d[1]]
     training_data = list(zip(training_inputs, training_results))
